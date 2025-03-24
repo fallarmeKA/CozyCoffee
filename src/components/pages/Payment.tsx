@@ -3,29 +3,66 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreditCard, Landmark, ArrowRight } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "@/store/cartStore";
+import { useCart } from "../../store/cartStore";
 
 const Payment = () => {
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState("credit-card");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const { cartItems, subtotal, tax, total, itemCount, clearCart } = useCart();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [cardName, setCardName] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiry, setExpiry] = useState("");
+  const [cvc, setCvc] = useState("");
+  const [billingAddress, setBillingAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [zip, setZip] = useState("");
+
+  const validateForm = () => {
+    const cardNumberRegex = /^\d{4} \d{4} \d{4} \d{4}$/;
+    const expiryRegex = /^(0[1-9]|1[0-2])\/(\d{2})$/;
+    const cvcRegex = /^\d{3,4}$/;
+
+    if (!cardName || !cardNumber || !expiry || !cvc || !billingAddress || !city || !zip) {
+      setError("All fields are required.");
+      return false;
+    }
+    if (!cardNumberRegex.test(cardNumber)) {
+      setError("Invalid card number format.");
+      return false;
+    }
+    if (!expiryRegex.test(expiry)) {
+      setError("Invalid expiry date format.");
+      return false;
+    }
+    if (!cvcRegex.test(cvc)) {
+      setError("Invalid CVC.");
+      return false;
+    }
+    setError("");
+    return true;
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
     setLoading(true);
 
-    // Simulate payment processing
     setTimeout(() => {
       setLoading(false);
-      clearCart(); // Clear cart after successful payment
-      navigate("/order-confirmation");
+      if (Math.random() < 0.2) {
+        setError("Payment failed! Please try again.");
+      } else {
+        clearCart();
+        navigate("/order-confirmation");
+      }
     }, 1500);
   };
 
@@ -44,170 +81,42 @@ const Payment = () => {
               <CardContent className="p-6">
                 <h2 className="mb-6 text-xl font-semibold">Payment Method</h2>
 
-                <Tabs
-                  defaultValue="credit-card"
-                  onValueChange={setPaymentMethod}
-                >
+                <Tabs defaultValue="credit-card" onValueChange={setPaymentMethod}>
                   <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger
-                      value="credit-card"
-                      className="flex items-center justify-center"
-                    >
-                      <CreditCard className="mr-2 h-4 w-4" />
-                      Credit Card
+                    <TabsTrigger value="credit-card" className="flex items-center justify-center">
+                      <CreditCard className="mr-2 h-4 w-4" /> Credit Card
                     </TabsTrigger>
-                    <TabsTrigger
-                      value="bank-transfer"
-                      className="flex items-center justify-center"
-                    >
-                      <Landmark className="mr-2 h-4 w-4" />
-                      Bank Transfer
+                    <TabsTrigger value="bank-transfer" className="flex items-center justify-center">
+                      <Landmark className="mr-2 h-4 w-4" /> Bank Transfer
                     </TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="credit-card">
+                    {error && <p className="text-red-600">{error}</p>}
                     <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="card-name">Name on Card</Label>
-                        <Input id="card-name" placeholder="John Doe" required />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="card-number">Card Number</Label>
-                        <Input
-                          id="card-number"
-                          placeholder="1234 5678 9012 3456"
-                          required
-                        />
-                      </div>
-
+                      <Input id="card-name" value={cardName} onChange={(e) => setCardName(e.target.value)} placeholder="John Doe" required />
+                      <Input id="card-number" value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} placeholder="1234 5678 9012 3456" required />
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="expiry">Expiry Date</Label>
-                          <Input id="expiry" placeholder="MM/YY" required />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="cvc">CVC</Label>
-                          <Input id="cvc" placeholder="123" required />
-                        </div>
+                        <Input id="expiry" value={expiry} onChange={(e) => setExpiry(e.target.value)} placeholder="MM/YY" required />
+                        <Input id="cvc" type="password" value={cvc} onChange={(e) => setCvc(e.target.value)} placeholder="123" required />
                       </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="billing-address">Billing Address</Label>
-                        <Input
-                          id="billing-address"
-                          placeholder="123 Coffee St"
-                          required
-                        />
-                      </div>
-
+                      <Input id="billing-address" value={billingAddress} onChange={(e) => setBillingAddress(e.target.value)} placeholder="123 Coffee St" required />
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="city">City</Label>
-                          <Input id="city" placeholder="New York" required />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="zip">ZIP Code</Label>
-                          <Input id="zip" placeholder="10001" required />
-                        </div>
+                        <Input id="city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="New York" required />
+                        <Input id="zip" value={zip} onChange={(e) => setZip(e.target.value)} placeholder="10001" required />
                       </div>
-
-                      <Button
-                        type="submit"
-                        className="mt-6 w-full bg-amber-700 hover:bg-amber-800"
-                        size="lg"
-                        disabled={loading}
-                      >
+                      <Button type="submit" className="mt-6 w-full bg-amber-700 hover:bg-amber-800" size="lg" disabled={loading}>
                         {loading ? "Processing..." : "Pay Now"}
                         {!loading && <ArrowRight className="ml-2 h-4 w-4" />}
                       </Button>
                     </form>
                   </TabsContent>
-
-                  <TabsContent value="bank-transfer">
-                    <div className="mt-6 space-y-4">
-                      <p className="text-gray-600">
-                        Please use the following details to make a bank
-                        transfer:
-                      </p>
-
-                      <div className="rounded-md bg-gray-50 p-4">
-                        <p>
-                          <strong>Bank Name:</strong> Cozy Coffee Bank
-                        </p>
-                        <p>
-                          <strong>Account Name:</strong> Cozy Coffee LLC
-                        </p>
-                        <p>
-                          <strong>Account Number:</strong> 1234567890
-                        </p>
-                        <p>
-                          <strong>Routing Number:</strong> 987654321
-                        </p>
-                        <p>
-                          <strong>Reference:</strong> Your Order #CC-
-                          {Math.floor(Math.random() * 10000)}
-                        </p>
-                      </div>
-
-                      <p className="text-sm text-gray-500">
-                        Please note that your order will only be processed after
-                        we receive your payment. This may take 1-2 business
-                        days.
-                      </p>
-
-                      <Button
-                        onClick={handleSubmit}
-                        className="mt-6 w-full bg-amber-700 hover:bg-amber-800"
-                        size="lg"
-                        disabled={loading}
-                      >
-                        {loading ? "Processing..." : "Complete Order"}
-                        {!loading && <ArrowRight className="ml-2 h-4 w-4" />}
-                      </Button>
-                    </div>
-                  </TabsContent>
                 </Tabs>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div>
-            <Card>
-              <CardContent className="p-6">
-                <h2 className="mb-4 text-xl font-semibold">Order Summary</h2>
-
-                {cartItems.map((item) => (
-                  <div key={item.id} className="mb-2 flex justify-between">
-                    <span>
-                      {item.quantity} × {item.name}
-                    </span>
-                    <span>${(item.price * item.quantity).toFixed(2)}</span>
-                  </div>
-                ))}
-
-                <div className="mt-4 space-y-2">
-                  <div className="flex justify-between">
-                    <span>Subtotal</span>
-                    <span>${subtotal.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Tax (8%)</span>
-                    <span>${tax.toFixed(2)}</span>
-                  </div>
-                  <div className="border-t border-gray-200 pt-2">
-                    <div className="flex justify-between font-semibold">
-                      <span>Total</span>
-                      <span>${total.toFixed(2)}</span>
-                    </div>
-                  </div>
-                </div>
               </CardContent>
             </Card>
           </div>
         </div>
       </div>
-
       <Footer />
     </div>
   );
