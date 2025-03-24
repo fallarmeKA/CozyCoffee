@@ -8,7 +8,7 @@ import { CreditCard, Landmark, ArrowRight } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "../../store/cartStore";
+import { useCart } from "@/store/cartStore";
 
 const Payment = () => {
   const navigate = useNavigate();

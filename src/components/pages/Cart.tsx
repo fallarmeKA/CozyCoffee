@@ -5,15 +5,7 @@ import { Trash2, Plus, Minus, ArrowRight } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Link } from "react-router-dom";
-import { useCart } from "@/store/cartStore";
-
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
-  quantity: number;
-}
+import { useCart, CartItem } from "/store/cartStore";
 
 const MENU_ITEMS = [
   {
@@ -80,7 +72,7 @@ const Cart = () => {
         ) : (
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2">
-              {cartItems.map((item) => (
+              {cartItems.map((item: CartItem) => (
                 <Card key={item.id} className="mb-4 overflow-hidden">
                   <CardContent className="p-0">
                     <div className="flex items-center p-4">
