@@ -5,7 +5,7 @@ import { Trash2, Plus, Minus, ArrowRight } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Link } from "react-router-dom";
-import { useCart } from "../../store/cartStore";
+import { useCart } from "@/store/cartStore";
 
 interface CartItem {
   id: string;
