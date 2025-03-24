@@ -6,6 +6,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Search, ShoppingCart } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useCart } from "@/store/cartStore";
 
 interface Product {
   id: string;
@@ -188,12 +189,19 @@ const MENU_ITEMS: Product[] = [
 
 const Menu = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [cartItems, setCartItems] = useState<string[]>([]);
+  const { addToCart, itemCount } = useCart();
 
   const handleAddToCart = (id: string) => {
-    setCartItems([...cartItems, id]);
-    // In a real app, you would dispatch to a cart store or context
-    console.log(`Added product ${id} to cart`);
+    const product = MENU_ITEMS.find((item) => item.id === id);
+    if (product) {
+      addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+      });
+      console.log(`Added product ${id} to cart`);
+    }
   };
 
   const filteredProducts = MENU_ITEMS.filter(
@@ -217,7 +225,7 @@ const Menu = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar cartItemCount={cartItems.length} />
+      <Navbar cartItemCount={itemCount} />
 
       <div className="container mx-auto px-4 py-8 pt-24">
         <h1 className="mb-8 font-dancing-script text-4xl font-bold text-amber-900 md:text-5xl">
@@ -321,7 +329,7 @@ const Menu = () => {
             size="lg"
           >
             <ShoppingCart className="mr-2 h-5 w-5" />
-            View Cart ({cartItems.length})
+            View Cart ({itemCount})
           </Button>
         </div>
       </div>

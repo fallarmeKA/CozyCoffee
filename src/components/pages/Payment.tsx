@@ -9,24 +9,13 @@ import { CreditCard, Landmark, ArrowRight } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "@/store/cartStore";
 
 const Payment = () => {
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState("credit-card");
   const [loading, setLoading] = useState(false);
-
-  // In a real app, this would come from a cart context or store
-  const cartItems = [
-    { id: "hot-1", name: "Signature Espresso", price: 3.99, quantity: 1 },
-    { id: "pastry-1", name: "Butter Croissant", price: 3.49, quantity: 2 },
-  ];
-
-  const subtotal = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0,
-  );
-  const tax = subtotal * 0.08; // 8% tax
-  const total = subtotal + tax;
+  const { cartItems, subtotal, tax, total, itemCount, clearCart } = useCart();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,18 +24,14 @@ const Payment = () => {
     // Simulate payment processing
     setTimeout(() => {
       setLoading(false);
+      clearCart(); // Clear cart after successful payment
       navigate("/order-confirmation");
     }, 1500);
   };
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar
-        cartItemCount={cartItems.reduce(
-          (count, item) => count + item.quantity,
-          0,
-        )}
-      />
+      <Navbar cartItemCount={itemCount} />
 
       <div className="container mx-auto px-4 py-8 pt-24">
         <h1 className="mb-8 font-dancing-script text-4xl font-bold text-amber-900 md:text-5xl">

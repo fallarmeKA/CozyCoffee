@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Trash2, Plus, Minus, ArrowRight } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Link } from "react-router-dom";
+import { useCart } from "../../store/cartStore";
 
 interface CartItem {
   id: string;
@@ -46,63 +47,20 @@ const MENU_ITEMS = [
 ];
 
 const Cart = () => {
-  // In a real app, this would come from a cart context or store
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: "hot-1",
-      name: "Signature Espresso",
-      price: 3.99,
-      image:
-        "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&q=80",
-      quantity: 1,
-    },
-    {
-      id: "pastry-1",
-      name: "Butter Croissant",
-      price: 3.49,
-      image:
-        "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400&q=80",
-      quantity: 2,
-    },
-  ]);
-
-  const increaseQuantity = (id: string) => {
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
-      ),
-    );
-  };
-
-  const decreaseQuantity = (id: string) => {
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === id && item.quantity > 1
-          ? { ...item, quantity: item.quantity - 1 }
-          : item,
-      ),
-    );
-  };
-
-  const removeItem = (id: string) => {
-    setCartItems(cartItems.filter((item) => item.id !== id));
-  };
-
-  const subtotal = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0,
-  );
-  const tax = subtotal * 0.08; // 8% tax
-  const total = subtotal + tax;
+  const {
+    cartItems,
+    increaseQuantity,
+    decreaseQuantity,
+    removeFromCart,
+    subtotal,
+    tax,
+    total,
+    itemCount,
+  } = useCart();
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar
-        cartItemCount={cartItems.reduce(
-          (count, item) => count + item.quantity,
-          0,
-        )}
-      />
+      <Navbar cartItemCount={itemCount} />
 
       <div className="container mx-auto px-4 py-8 pt-24">
         <h1 className="mb-8 font-dancing-script text-4xl font-bold text-amber-900 md:text-5xl">
@@ -161,7 +119,7 @@ const Cart = () => {
                         variant="ghost"
                         size="icon"
                         className="ml-4 text-gray-500 hover:text-red-500"
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => removeFromCart(item.id)}
                       >
                         <Trash2 className="h-5 w-5" />
                       </Button>

@@ -5,6 +5,7 @@ import { CheckCircle2, Coffee, ArrowRight } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Link } from "react-router-dom";
+import { useCart } from "@/store/cartStore";
 
 const OrderConfirmation = () => {
   const [orderNumber] = useState(`CC-${Math.floor(Math.random() * 10000)}`);

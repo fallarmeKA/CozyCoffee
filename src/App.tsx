@@ -10,6 +10,8 @@ const Payment = lazy(() => import("./components/pages/Payment"));
 const OrderConfirmation = lazy(
   () => import("./components/pages/OrderConfirmation"),
 );
+const AboutUs = lazy(() => import("./components/pages/AboutUs"));
+const ContactUs = lazy(() => import("./components/pages/ContactUs"));
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/payment" element={<Payment />} />
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/contact" element={<ContactUs />} />
           {/* Add the Tempo route pattern to avoid conflicts with the catch-all route */}
           {import.meta.env.VITE_TEMPO === "true" && (
             <Route path="/tempobook/*" />
